@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <string.h>
+#include <android/log.h>
 #include "error.h"
 #include "helpers.h"
 #include "conff.h"
@@ -59,8 +60,16 @@ void crash_msg(char *msg)
 /* Log a warning, error or info message.
  * If we are a daemon, use the syslog. s is a format string like in printf,
  * the optional following arguments are the arguments like in printf */
-void log_message(int prior, const char *s, ...)
+void log_message(int prior, const char *fmt, ...)
 {
+#ifdef ANDROID
+	char line[1024];
+	va_list argptr;
+	va_start(argptr, fmt);
+	vsprintf(line, fmt, argptr);
+	__android_log_print(prior, "pdnsd", "%s", line);
+	va_end(argptr);
+#else
 	int gotlock=0;
 	va_list va;
 	FILE *f;
@@ -112,6 +121,7 @@ void log_message(int prior, const char *s, ...)
 	}
 	if (gotlock)
 		pthread_mutex_unlock(&loglock);
+#endif
 }
 
 
@@ -135,8 +145,16 @@ void debug_msg(int c, const char *fmt, ...)
 		}
 	}
 	va_start(va,fmt);
+#ifdef ANDROID
+	char line[1024];
+	vsprintf(line, fmt, va);
+	__android_log_print(ANDROID_LOG_DEBUG, "pdnsd", "%s", line);
+#else
 	vfprintf(dbg_file,fmt,va);
+#endif
 	va_end(va);
+#ifndef ANDROID
 	fflush(dbg_file);
+#endif
 }
 #endif /* DEBUG */
