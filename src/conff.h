@@ -83,10 +83,11 @@ typedef DYNAMIC_ARRAY(addr6maskpair_t) *a6_array;
 typedef struct {
 	unsigned short   port;
 	short            uptest;
+    short            qm;
 	time_t           timeout;
 	time_t           interval;
 	time_t           ping_timeout;
-        char             scheme[32];
+    char             scheme[32];
 	char            *uptest_cmd;
 	char             uptest_usr[21];
 	char             interface[IFNAMSIZ];
