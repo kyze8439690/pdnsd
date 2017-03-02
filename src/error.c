@@ -131,6 +131,7 @@ void debug_msg(int c, const char *fmt, ...)
 {
 	va_list va;
 
+#ifndef ANDROID
 	if (!c) {
 		char ts[sizeof "12/31 23:59:59"];
 		time_t tt = time(NULL);
@@ -144,6 +145,8 @@ void debug_msg(int c, const char *fmt, ...)
 				fprintf(dbg_file,"- %s| ", ts);
 		}
 	}
+#endif
+
 	va_start(va,fmt);
 #ifdef ANDROID
 	char line[1024];
